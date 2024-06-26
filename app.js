@@ -12,7 +12,10 @@ const notificationElement = document.querySelector(".notification");
 const weather = {};
 
 weather.temperature = {
-    unit : "celsius"
+    unit:"celsius", //C ==> F then converts back
+    unit:"kelvin",
+    unit:"fahrenheit"
+
 }
 
 // APP CONSTS AND VARS
@@ -30,10 +33,10 @@ if('geolocation' in navigator){
 
 // SET USER'S POSITION
 function setPosition(position){
-    let latitude = position.coords.latitude;
-    let longitude = position.coords.longitude;
+    let latitude = position.coords.latitude;    //enlemi bul
+    let longitude = position.coords.longitude;  //boylamı bul
     
-    getWeather(latitude, longitude);
+    getWeather(latitude, longitude);    //weather be found according to the "ENLEM" && "BOYLAM"
 }
 
 // SHOW ERROR WHEN THERE IS AN ISSUE WITH GEOLOCATION SERVICE
@@ -46,7 +49,7 @@ function showError(error){
 function getWeather(latitude, longitude){
     let api = `http://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${key}`;
     
-    fetch(api)
+    fetch(api) 
         .then(function(response){
             let data = response.json();
             return data;
@@ -58,25 +61,40 @@ function getWeather(latitude, longitude){
             weather.city = data.name;
             weather.country = data.sys.country;
         })
-        .then(function(){
+        .then(function(){ //call the method below to display the Weather
             displayWeather();
         });
 }
 
 // DISPLAY WEATHER TO UI
 function displayWeather(){
-    iconElement.innerHTML = `<img src="icons/${weather.iconId}.png"/>`;
-    tempElement.innerHTML = `${weather.temperature.value}°<span>C</span>`;
+    iconElement.innerHTML = `<img src="icons/${weather.iconId}.png"/>`; //icon is an image with .png extension
+    tempElement.innerHTML = `${weather.temperature.value}°<span>C</span>`; // xx °C
     descElement.innerHTML = weather.description;
-    locationElement.innerHTML = `${weather.city}, ${weather.country}`;
+    locationElement.innerHTML = `${weather.city}, ${weather.country}`;  //antalya
 }
+
+// The icon will be appeared first then the actual weather in your current location, after a short description about how it feels like, and at last the city is shown
+
 
 // C to F conversion
 function celsiusToFahrenheit(temperature){
     return (temperature * 9/5) + 32;
 }
 
-// WHEN THE USER CLICKS ON THE TEMPERATURE ELEMENET
+
+//C to K conversion
+function celsiusToKelvin(temperature){
+    return (temperature+273.15);
+}
+
+//F to K 
+function fahrenheitToKelvin(temperature){
+    return (temperature-32)*5/9+273.15;
+}
+
+
+// WHEN THE USER CLICKS ON THE TEMPERATURE ELEMENT
 tempElement.addEventListener("click", function(){
     if(weather.temperature.value === undefined) return;
     
@@ -84,8 +102,18 @@ tempElement.addEventListener("click", function(){
         let fahrenheit = celsiusToFahrenheit(weather.temperature.value);
         fahrenheit = Math.floor(fahrenheit);
         
+            //let kelvin=celsiusToKelvin(weather.temperature.value);
+            //kelvin=Math.floor(kelvin);
+
+            let kelvin=fahrenheitToKelvin(weather.temperature.value);
+            kelvin=Math.floor(kelvin);
+
         tempElement.innerHTML = `${fahrenheit}°<span>F</span>`;
         weather.temperature.unit = "fahrenheit";
+
+
+        //tempElement.innerHTML=`${kelvin}°<span>K</span>`;
+        //weather.temperature.unit="Kelvin";
     }else{
         tempElement.innerHTML = `${weather.temperature.value}°<span>C</span>`;
         weather.temperature.unit = "celsius"
